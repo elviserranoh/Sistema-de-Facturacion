@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns:th="http:://www.thymeleaf.org">
+<head th:fragment="head">
+<meta charset="utf-8" />
+<title
+	th:text="'Spring Boot: MVC + Thymeleaf + Dataa JPA - ' + ${titulo}"></title>
+<link rel="stylesheet" th:href="@{'/css/bootstrap.min.css'}">
+</head>
+<body>
+	<header th:fragment="header">
+		<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+			<a class="navbar-brand" th:href="@{'/listar'}">Spring Boot</a>
+			<button class="navbar-toggler" type="button" data-toggle="collapse"
+				data-target="#navbarNav" aria-controls="navbarNav"
+				aria-expanded="false" aria-label="Toggle navigation">
+				<span class="navbar-toggler-icon"></span>
+			</button>
+			<div class="collapse navbar-collapse" id="navbarNav">
+				<ul class="navbar-nav">
+					<li class="nav-item active"><a class="nav-link" th:href="@{'/listar'}">Inicio
+							<span class="sr-only">(current)</span>
+					</a></li>
+					<li class="nav-item"><a class="nav-link" th:href="@{/listar}">Clientes</a>
+					</li>
+				</ul>
+			</div>
+		</nav>
+		<div class="alert alert-success" th:if="${success != null}" th:text="${success}"></div>
+		<div class="alert alert-danger" th:if="${danger != null}" th:text="${danger}"></div>
+		<div class="alert alert-warning" th:if="${warning != null}" th:text="${warning}"></div>
+		<div class="alert alert-info" th:if="${info != null}" th:text="${info}"></div>
+	</header>
+	<div class="container"></div>
+
+	<footer th:fragment="footer" class="container">
+		<img th:src="@{'/images/spring.png'}" alt="Spring Boot" width="160" />
+		<br>
+		<p>
+			Power By <a href="https:://projects.spring.io/spring-boot/">Spring
+				Boot</a> y <a href="http:://www.thymeleaf.or">Thymeleaf</a>
+		</p>
+		<p>Este proyecto fue desarrollado en IDE Eclipse + Spring Plugins
+			(STS Spring Tool), Elvis Serrano.</p>
+	</footer>
+
+	<script th:src="@{'/js/jquery-3.3.1.slim.min.js'}"></script>
+	<script th:src="@{'/js/popper.min.js'}"></script>
+	<script th:src="@{'/js/bootstrap.min.js'}"></script>
+</body>
+</html>
