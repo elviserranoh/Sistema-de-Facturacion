@@ -1,20 +1,18 @@
 package com.bolsadeideas.springboot.app.controllers;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.net.MalformedURLException;
 import java.util.Map;
-import java.util.UUID;
 
 import javax.validation.Valid;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -29,16 +27,34 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.bolsadeideas.springboot.app.entity.Cliente;
 import com.bolsadeideas.springboot.app.service.IClienteService;
+import com.bolsadeideas.springboot.app.service.IUploadFileService;
 import com.bolsadeideas.springboot.app.util.paginator.PageRender;
 
 @Controller
 @SessionAttributes("cliente")
 public class ClienteController {
 
-	private final Logger log = LoggerFactory.getLogger(getClass());
-	
 	@Autowired
 	private IClienteService clienteService;
+
+	@Autowired
+	private IUploadFileService uploadFileService;
+
+	@GetMapping(value = "/uploads/{filename:.+}")
+	public ResponseEntity<Resource> verFoto(@PathVariable String filename) {
+
+		Resource recurso = null;
+		try {
+			recurso = uploadFileService.load(filename);
+		} catch (MalformedURLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		return ResponseEntity.ok()
+				.header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + recurso.getFilename() + "\"")
+				.body(recurso);
+	}
 
 	@GetMapping({ "/ver/{id}" })
 	public String ver(@PathVariable(value = "id") Long id, Model model, RedirectAttributes flash) {
@@ -79,40 +95,35 @@ public class ClienteController {
 	@PostMapping({ "/form" })
 	public String crear(@Valid Cliente cliente, BindingResult result, Model model,
 			@RequestParam("file") MultipartFile foto, RedirectAttributes flash, SessionStatus status) {
-		
+
 		String uniqueFilename = null;
-		
+
 		if (result.hasErrors()) {
 			model.addAttribute("titulo", "Formulario de Cliente");
 			return "cliente/form";
 		}
 
 		if (!foto.isEmpty()) {
-			
-			uniqueFilename = UUID.randomUUID().toString() + "_" + foto.getOriginalFilename();
-			
-			Path rootPath = Paths.get("uploads").resolve(uniqueFilename);
-			Path rootAbsolutPath = rootPath.toAbsolutePath();
-			
-			log.info("rootPath: " + rootPath); // path relativo al proyecto
-			log.info("rootAbsolutPath: " + rootAbsolutPath); // path absoluto al proyecto
-			
+
+			if (cliente.getId() != null && cliente.getId() > 0 && cliente.getFoto() != null
+					&& cliente.getFoto().length() > 0) {
+
+				uploadFileService.delete(cliente.getFoto());
+
+			}
+
 			try {
-//				byte[] bytes = foto.getBytes();
-//				Path rutaCompleta = Paths.get(rootPath + "//" + foto.getOriginalFilename());
-//				Files.write(rutaCompleta, bytes);
-				
-				Files.copy(foto.getInputStream(), rootAbsolutPath);
-				flash.addFlashAttribute("info", "Ha subido correctamente '" + foto.getOriginalFilename() + "'");
-				cliente.setFoto(foto.getOriginalFilename());
+				uniqueFilename = uploadFileService.copy(foto);
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+
+			flash.addFlashAttribute("info", "Ha subido correctamente '" + uniqueFilename + "'");
+			cliente.setFoto(uniqueFilename);
 		}
 
 		String messageFlash = (cliente.getId() != null) ? "Cliente editado con exito" : "Cliente creado con exito";
-		cliente.setFoto(uniqueFilename);
 		clienteService.save(cliente);
 
 		status.setComplete();
@@ -145,8 +156,12 @@ public class ClienteController {
 	public String eliminar(@PathVariable(value = "id") Long id, RedirectAttributes flash) {
 
 		if (id > 0) {
+			Cliente cliente = clienteService.findOne(id);
 			clienteService.delete(id);
-			flash.addFlashAttribute("success", "Cliente eliminado con exito");
+			if (uploadFileService.delete(cliente.getFoto())) {
+				flash.addFlashAttribute("success", "Cliente eliminado con exito");
+			}
+
 		}
 
 		return "redirect:/listar";
