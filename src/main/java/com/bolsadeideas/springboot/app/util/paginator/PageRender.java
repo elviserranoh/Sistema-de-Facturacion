@@ -18,7 +18,6 @@ public class PageRender<T> {
 		super();
 	}
 
-	@SuppressWarnings("unused")
 	public PageRender(String url, Page<T> page) {
 		this.url = url;
 		this.page = page;
