@@ -4,5 +4,7 @@
 ### Se utilizo el patron DAO, Service, Controller 
 
 
-![alt text](https://i.ibb.co/7ngzbtz/image.png)
-![alt text](https://i.ibb.co/6R7xXSW/image.png)
+![alt text](https://i.ibb.co/4j33x0f/image.png)
+![alt text](https://i.ibb.co/fXKdBJ7/image.png)
+![alt text](https://i.ibb.co/YthS0n6/image.png)
+![alt text](https://i.ibb.co/XJ45cJh/image.png)
