@@ -1,6 +1,7 @@
-***# Spring Boot CRUD***
+***# Spring Boot: Sistema de Facturación***
 
-## Simple CRUD con Spring Boot - JPA, Thymeleaf, se utilizo el patron DAO, Service, Controller 
+## Sistema de Facturación Desarrollado en: Spring Boot - JPA, Thymeleaf
+### Se utilizo el patron DAO, Service, Controller 
 
 
 ![alt text](https://i.ibb.co/7ngzbtz/image.png)
