@@ -2,6 +2,7 @@
 
 ## Sistema de Facturación Desarrollado en: Spring Boot - JPA, Thymeleaf
 ### Se utilizo el patron DAO, Service, Controller 
+#### Se implemento el sistema de autenticación con Spring Security
 
 
 ![alt text](https://i.ibb.co/4j33x0f/image.png)
